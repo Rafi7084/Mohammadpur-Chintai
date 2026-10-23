@@ -65,8 +65,7 @@ body{
   color:var(--haldi);text-shadow:2px 2px 0 var(--ink)}
 .cash.bump b{animation:bump .28s ease-out}
 @keyframes bump{40%{transform:scale(1.14)}}
-.bar{height:9px;border-radius:6px;background:rgba(0,0,0,.35);overflow:hidden;border:2px solid var(--ink)}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--haldi),var(--pink));transition:width .25s}
+.cash small{display:block;font-size:clamp(12px,2.6vmin,15px);font-weight:700;color:#d7f2ee;line-height:1.1;margin-top:-2px}
 #pauseBtn{
   position:absolute;top:10px;left:calc(10px + env(safe-area-inset-left,0px));z-index:6;display:none;
   width:46px;height:46px;border-radius:12px;border:3px solid var(--ink);background:var(--paper);color:var(--ink);
@@ -130,6 +129,25 @@ body{
 .rules li b{font-size:1.35em;flex:none}
 .rules u{text-decoration:none;font-weight:800;color:var(--pink)}
 @media (max-height:460px){.rules{gap:4px;margin-bottom:10px}.rules li{padding:3px 10px;font-size:15px}}
+input.name{
+  display:block;width:min(340px,100%);margin:6px auto 4px;padding:10px 14px 8px;
+  font:700 clamp(18px,4vmin,24px) "Baloo Da 2",system-ui,sans-serif;text-align:center;
+  border:3px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);
+  -webkit-user-select:text;user-select:text;touch-action:manipulation;
+}
+input.name:focus{outline:3px solid var(--pink);outline-offset:2px}
+.err{min-height:22px;color:var(--tin);font-weight:700;font-size:15px;margin-bottom:6px}
+.src{font-size:14px;font-weight:600;color:var(--muted);margin:-4px 0 8px}
+.lb{list-style:none;margin:0 auto 14px;padding:0;max-width:440px;text-align:left;display:grid;gap:5px}
+.lb li{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:8px;background:var(--chip);
+  border:3px solid var(--ink);border-radius:11px;padding:4px 12px;font-weight:700;font-size:17px;line-height:1.3}
+.lb li .r{font-weight:800;text-align:center}
+.lb li .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb li .s{font-weight:800;color:var(--pink)}
+.lb li.me{background:var(--haldi);color:var(--ink)}
+.lb li.me .s{color:var(--tin)}
+.lb li.empty{display:block;text-align:center;font-weight:600;color:var(--muted)}
+.newbest{color:var(--pink);font-weight:800;font-size:clamp(17px,3.8vmin,22px);margin:-4px 0 6px}
 h2{margin:0 0 8px;font-size:clamp(24px,5.5vmin,34px);line-height:1.1}
 h3{margin:14px 0 6px;font-size:clamp(17px,3.6vmin,21px)}
 .flow{display:flex;flex-wrap:wrap;align-items:stretch;justify-content:center;gap:6px;margin:6px 0 4px}
@@ -168,7 +186,7 @@ kbd{font:700 13px "Baloo Da 2",system-ui,sans-serif;border:2px solid var(--ink);
   <div id="nojs"><div><b>Open this in a real browser</b>This file is shown in a preview viewer that can’t run games. Open it in <b style="display:inline;font-size:inherit">Chrome</b> (Android) or <b style="display:inline;font-size:inherit">Safari</b> (iPhone) instead.<br><br>বাংলায়: ফাইলটি Chrome বা Safari ব্রাউজারে খুলুন — ফাইল প্রিভিউতে গেম চলে না।</div></div>
   <canvas id="game" aria-label="Mohammadpur Chintai game"></canvas>
 
-  <div id="hud"><div class="cash" id="cashBox"><b id="cashText">CASH: ৳0 / ৳1,000</b><div class="bar"><i id="cashBar"></i></div></div></div>
+  <div id="hud"><div class="cash" id="cashBox"><b id="cashText">CASH: ৳0</b><small id="hudBest">Best ৳0</small></div></div>
   <button id="pauseBtn" aria-label="Pause">❚❚</button>
   <button id="jumpBtn" aria-label="Jump">JUMP<span>⬆</span></button>
 
@@ -176,14 +194,36 @@ kbd{font:700 13px "Baloo Da 2",system-ui,sans-serif;border:2px solid var(--ink);
   <div class="screen show" id="menu">
     <div class="card">
       <div class="sign"><small>MOHAMMADPUR</small><strong>CHINTAI</strong><em>মোহাম্মদপুর ছিনতাই</em></div>
-      <p class="tag">দৌড় অটো — তুমি শুধু লাফ দাও। Land on heads, dodge the police, reach ৳1,000.</p>
+      <p class="tag">দৌড় অটো — তুমি শুধু লাফ দাও। Land on heads, dodge the police, collect as much as you can.</p>
       <div class="btns">
         <button class="btn go" id="playBtn">▶ Play</button>
         <button class="btn alt" id="howBtn">How to play</button>
+        <button class="btn" id="boardBtn">🏆 Leaderboard</button>
         <button class="btn" id="soundBtn">🔊 Sound: on</button>
       </div>
       <div class="best" id="bestText">Best: ৳0</div>
       <div class="rotate">📱 Turn your phone sideways for the best view.</div>
+    </div>
+  </div>
+
+  <!-- NAME ENTRY -->
+  <div class="screen" id="nameScr">
+    <div class="card">
+      <h2>তোমার নাম লেখো</h2>
+      <p class="tag" style="margin-bottom:4px">Your name shows on the leaderboard.</p>
+      <input class="name" id="nameInput" type="text" maxlength="16" autocomplete="nickname" autocapitalize="words" enterkeyhint="next" placeholder="যেমন: মফিজ" aria-label="Your name">
+      <div class="err" id="nameErr"></div>
+      <div class="btns"><button class="btn go" id="nameGoBtn">পরবর্তী ›</button><button class="btn" id="nameBackBtn">পেছনে</button></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="screen" id="board">
+    <div class="card">
+      <h2>🏆 লিডারবোর্ড</h2>
+      <div class="src" id="boardSrc"></div>
+      <ol class="lb" id="boardList"></ol>
+      <div class="btns"><button class="btn" id="boardBackBtn">Back</button></div>
     </div>
   </div>
 
@@ -196,7 +236,7 @@ kbd{font:700 13px "Baloo Da 2",system-ui,sans-serif;border:2px solid var(--ink);
         <li><b>💰</b>পথচারীর মাথায় লাফিয়ে পড়লে ৳৫–২০ পাবে।</li>
         <li><b>🚓</b>পুলিশ ছুঁয়ে গেলে বা পুলিশের উপর লাফালে খেলা শেষ!</li>
         <li><b>🚧</b>ম্যানহোল, ইট বা ময়লায় হোঁচট খেলে ৳১০ কাটা যাবে।</li>
-        <li><b>🏆</b>৳১,০০০ জমাতে পারলেই জয়!</li>
+        <li><b>🏆</b>টাকার কোনো সীমা নেই — যত পারো জমাও, লিডারবোর্ডে সবার উপরে ওঠো!</li>
       </ul>
       <div class="btns"><button class="btn go" id="introGoBtn">▶ শুরু করো</button><button class="btn" id="introBackBtn">পেছনে</button></div>
     </div>
@@ -211,7 +251,7 @@ kbd{font:700 13px "Baloo Da 2",system-ui,sans-serif;border:2px solid var(--ink);
         <div class="step"><b>⬆</b><u>Tap JUMP</u>Your only control</div><div class="arrow">›</div>
         <div class="step"><b>💰</b><u>Land on heads</u>+৳5, 10, 15 or 20</div><div class="arrow">›</div>
         <div class="step"><b>🚓</b><u>Avoid police</u>One touch = caught</div><div class="arrow">›</div>
-        <div class="step"><b>🏆</b><u>Reach ৳1,000</u>You win</div>
+        <div class="step"><b>🏆</b><u>No limit</u>Top the leaderboard</div>
       </div>
       <h3>Who’s on the street</h3>
       <div class="who">
@@ -242,21 +282,14 @@ kbd{font:700 13px "Baloo Da 2",system-ui,sans-serif;border:2px solid var(--ink);
     <div class="card">
       <div class="big-red">ধরা খাইছো!</div>
       <h2>Game over</h2>
-      <div class="stat">You collected <span id="overCash">৳0</span> of ৳1,000</div>
-      <div class="best" id="overBest" style="margin:-6px 0 14px">Best: ৳0</div>
-      <div class="btns"><button class="btn go" id="againBtn">↻ Restart</button><button class="btn" id="overMenuBtn">Main menu</button></div>
+      <div class="stat">You collected <span id="overCash">৳0</span></div>
+      <div class="newbest" id="overNew" hidden>⭐ নতুন রেকর্ড! New personal best</div>
+      <div class="best" id="overBest" style="margin:-6px 0 10px">Best: ৳0</div>
+      <ol class="lb" id="overBoard"></ol>
+      <div class="btns"><button class="btn go" id="againBtn">↻ Restart</button><button class="btn alt" id="overBoardBtn">🏆 Leaderboard</button><button class="btn" id="overMenuBtn">Main menu</button></div>
     </div>
   </div>
 
-  <!-- VICTORY -->
-  <div class="screen" id="win">
-    <div class="card">
-      <div class="big-gold">মোহাম্মদপুরের নতুন বস!</div>
-      <h2>Victory</h2>
-      <div class="stat">You collected <span id="winCash">৳1,000</span> in <span id="winTime">0s</span></div>
-      <div class="btns"><button class="btn go" id="winAgainBtn">↻ Play again</button><button class="btn" id="winMenuBtn">Main menu</button></div>
-    </div>
-  </div>
 </div>
 
 <script>
@@ -273,7 +306,13 @@ const OUT = '#1d1a22', LW = 2.6;
 /* ================= tuning ================= */
 const RUN = 330;            // constant running speed (world units / s)
 const G = 2600, JUMP_V = 1060, BOUNCE_V = 760;
-const TARGET = 1000;
+const MILESTONE = 500; // celebration every ৳500 — there is no money limit
+
+/* ===== ONLINE LEADERBOARD (optional) =====
+   Paste your free Firebase project's ID and Web API key here to share one
+   leaderboard between everyone who opens the game. Leave empty to keep
+   the leaderboard on this device only. */
+const FIREBASE = { projectId: '', apiKey: '' };
 const PLAYER_W = 40, PED_W = 40, POL_W = 36;
 const PED_H = 98, POL_H = 108;
 const REWARDS = [5, 10, 15, 20];
@@ -923,6 +962,7 @@ const Snd = (() => {
       for (let i = 0; i < 8; i++) tone(rand(1800, 3200), 0.12, { type: 'sine', vol: 0.05, when: t + 0.9 + i * 0.12 });
       for (let i = 0; i < 6; i++) tone(150, 0.16, { type: 'sine', slide: 55, vol: 0.3, when: t + 0.9 + i * 0.22 }); },
     click() { tone(660, 0.05, { type: 'square', vol: 0.06 }); },
+    milestone() { const t = now(); [784, 988, 1175, 1568].forEach((f, i) => tone(f, i === 3 ? 0.35 : 0.12, { type: 'square', vol: 0.1, lp: 4500, when: t + 0.05 + i * 0.1 })); },
     say(text, who) {
       if (muted || !ac) return;
       this.duck(who === 'police' ? 1.8 : 1.6);
@@ -943,16 +983,93 @@ const Snd = (() => {
   };
 })();
 
+/* ================= players + leaderboard ================= */
+const Players = {
+  name: store.get('name', ''),
+  ids: store.get('ids', {}),
+  idFor(n) {
+    const k = n.toLowerCase();
+    if (!this.ids[k]) { this.ids[k] = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); store.set('ids', this.ids); }
+    return this.ids[k];
+  },
+  setName(n) { this.name = n; store.set('name', n); },
+  get id() { return this.name ? this.idFor(this.name) : null; }
+};
+const LB = {
+  online: !!(FIREBASE.projectId && FIREBASE.apiKey),
+  lastSource: 'local',
+  localList() { return store.get('board', []); },
+  localBest(id) { const e = this.localList().find(x => x.id === id); return e ? e.score : 0; },
+  saveLocal(id, name, score) {
+    const list = this.localList(); const e = list.find(x => x.id === id);
+    if (e) { e.name = name; e.score = Math.max(e.score, score); } else list.push({ id, name, score });
+    list.sort((a, b) => b.score - a.score); store.set('board', list.slice(0, 100));
+  },
+  url(path) { return `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(FIREBASE.projectId)}/databases/(default)/documents${path}?key=${encodeURIComponent(FIREBASE.apiKey)}`; },
+  async req(path, opts) {
+    const ac = new AbortController(); const to = setTimeout(() => ac.abort(), 7000);
+    try { const r = await fetch(this.url(path), Object.assign({ signal: ac.signal, headers: { 'Content-Type': 'application/json' } }, opts)); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.json(); }
+    finally { clearTimeout(to); }
+  },
+  async submit(id, name, score) {
+    const prev = this.localBest(id);
+    this.saveLocal(id, name, score);
+    if (!this.online || score <= prev) return;
+    try {
+      await this.req('/scores/' + id, { method: 'PATCH', body: JSON.stringify({ fields: {
+        name: { stringValue: name }, score: { integerValue: String(Math.floor(score)) }, updated: { timestampValue: new Date().toISOString() } } }) });
+    } catch (e) { /* offline: score stays on this device */ }
+  },
+  async top(n) {
+    if (this.online) {
+      try {
+        const res = await this.req(':runQuery', { method: 'POST', body: JSON.stringify({ structuredQuery: {
+          from: [{ collectionId: 'scores' }], orderBy: [{ field: { fieldPath: 'score' }, direction: 'DESCENDING' }], limit: n } }) });
+        const list = (Array.isArray(res) ? res : []).filter(r => r.document).map(r => {
+          const f = r.document.fields || {}; const id = r.document.name.split('/').pop();
+          return { id, name: (f.name && f.name.stringValue) || '?', score: Number((f.score && (f.score.integerValue || f.score.doubleValue)) || 0) };
+        });
+        this.lastSource = 'online'; return list;
+      } catch (e) { this.lastSource = 'offline'; }
+    } else this.lastSource = 'local';
+    return this.localList().slice(0, n);
+  },
+  sourceText() {
+    return this.lastSource === 'online' ? '🌐 Online — everyone who plays' :
+      this.lastSource === 'offline' ? '📱 Can’t reach the online board — showing this device' : '📱 Players on this device';
+  }
+};
+function renderBoard(ol, list, meId, max) {
+  ol.textContent = '';
+  if (!list.length) { const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'No scores yet — be the first!'; ol.appendChild(li); return; }
+  const medals = ['🥇', '🥈', '🥉'];
+  list.slice(0, max).forEach((e, i) => {
+    const li = document.createElement('li'); if (e.id === meId) li.className = 'me';
+    const r = document.createElement('span'); r.className = 'r'; r.textContent = medals[i] || (i + 1);
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = e.name;
+    const sc = document.createElement('span'); sc.className = 's'; sc.textContent = fmt(e.score);
+    li.append(r, n, sc); ol.appendChild(li);
+  });
+  const myIdx = list.findIndex(e => e.id === meId);
+  if (meId && myIdx >= max) {
+    const e = list[myIdx], li = document.createElement('li'); li.className = 'me';
+    const r = document.createElement('span'); r.className = 'r'; r.textContent = myIdx + 1;
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = e.name;
+    const sc = document.createElement('span'); sc.className = 's'; sc.textContent = fmt(e.score);
+    li.append(r, n, sc); ol.appendChild(li);
+  }
+}
+
 /* ================= game state ================= */
 let state = 'menu', time = 0, gameTime = 0, dist = 0, rf = 1, shake = 0;
-let cash = 0, best = store.get('best', 0), caughtT = 0, wonT = 0, lastVoice = -9, winShown = false;
+let cash = 0, best = 0, nextMilestone = MILESTONE, caughtT = 0, wonT = 0, lastVoice = -9, winShown = false;
 const P = { h: 0, vy: 0, onGround: true, buffer: 0, trip: 0, ph: 0, combo: 0, sq: 0 };
 let ents = [], parts = [], floats = [], bubbles = [], vehicles = [], vTimer = [0.4, 1.0], honkT = 3;
 let plan = null, lastType = null, spawned = 0, chainLeft = 0;
 
 function resetGame() {
   ents = []; parts = []; floats = []; bubbles = [];
-  cash = 0; gameTime = 0; caughtT = 0; wonT = 0; winShown = false; shake = 0;
+  cash = 0; nextMilestone = MILESTONE; gameTime = 0; caughtT = 0; wonT = 0; winShown = false; shake = 0;
   Object.assign(P, { h: 0, vy: 0, onGround: true, buffer: 0, trip: 0, combo: 0, sq: 0 });
   plan = null; lastType = null; spawned = 0; chainLeft = 0;
   updateHUD(false);
@@ -961,7 +1078,7 @@ function resetGame() {
 /* ---------- spawning (time-of-arrival scheduler keeps every pattern fair) ---------- */
 function travelTime(walk) { return (W + 90 - playerX) / (RUN + walk); }
 function planNext() {
-  const d = cash / TARGET;
+  const d = Math.min(1, cash / 1500);
   let type, sub = null, walk = 0, pair = false, look = null;
   if (chainLeft > 0) { type = 'ped'; sub = 'tea'; walk = 0; chainLeft--; }
   else if (spawned < 3) type = 'ped';
@@ -1038,7 +1155,7 @@ function stomp(e) {
   if (time - lastVoice > 1.5) { Snd.say('আমার বাপ-দাদার সম্পত্তি!', 'gangster'); lastVoice = time; }
   Snd.stomp(); Snd.cash();
   burstNotes(e.x, groundY - PED_H, 6);
-  if (cash >= TARGET) win();
+  if (cash >= nextMilestone) milestone();
 }
 function trip(e) {
   e.hit = true; const loss = Math.min(cash, 10); cash -= loss; updateHUD(loss > 0);
@@ -1053,19 +1170,17 @@ function caught(e) {
   bubble(e, 'এবার তোরে পাইছি!', '#1f3d66', 2.6);
   setUI('caught');
 }
-function win() {
-  state = 'won'; wonT = 0; Snd.stopMusic(); Snd.victory(); confetti(70);
-  ents.forEach(e => { if (e.type === 'police') { e.state = 'leave'; e.face = 1; e.walk = -70; e.pose = 'patrol'; } else if (e.type === 'ped' && e.state === 'walk') { e.state = 'flee'; e.walk = 420; e.face = -1; } });
-  if (cash > best) { best = cash; store.set('best', best); }
-  setUI('won');
+function milestone() {
+  const m = nextMilestone; nextMilestone += MILESTONE;
+  float(W / 2, Math.max(90, baseY - 40), '৳' + m.toLocaleString('en-US') + ' পার! 🔥', '#ffc93c', 40);
+  confetti(40); Snd.milestone();
 }
-
 /* ================= update ================= */
 function update(dt) {
   time += dt;
   if (state === 'paused') return;
   if (state === 'playing') { gameTime += dt; rf = 1; }
-  else if (state === 'menu' || state === 'howto' || state === 'intro') rf = 1;
+  else if (state === 'menu' || state === 'howto' || state === 'intro' || state === 'name' || state === 'board') rf = 1;
   else if (state === 'caught' || state === 'over') rf = 0;
   else if (state === 'won') rf = Math.max(0, rf - dt * 1.4);
   dist += RUN * rf * dt;
@@ -1117,7 +1232,6 @@ function update(dt) {
     }
   }
   if (state === 'caught') { caughtT += dt; if (caughtT > 2.5) showOver(); }
-  if (state === 'won') { wonT += dt; if (wonT < 3.5 && Math.random() < dt * 12) confetti(3); if (wonT > 1.4 && !winShown) { winShown = true; showWin(); } if (wonT > 3.5 && Math.random() < dt * 3) confetti(2); }
   // particles
   for (const p of parts) {
     p.t += dt;
@@ -1334,21 +1448,24 @@ function drawPoles(offB) {
 }
 
 /* ================= UI ================= */
-const ui = { hud: $('hud'), jump: $('jumpBtn'), pause: $('pauseBtn'), screens: ['menu', 'intro', 'howto', 'pause', 'over', 'win'].map($) };
+const ui = { hud: $('hud'), jump: $('jumpBtn'), pause: $('pauseBtn'), screens: ['menu', 'nameScr', 'board', 'intro', 'howto', 'pause', 'over'].map($) };
 function showScreen(id) { ui.screens.forEach(s => s.classList.toggle('show', s.id === id)); }
 function setUI(s) {
   const playing = s === 'playing';
-  ui.hud.classList.toggle('show', s !== 'menu' && s !== 'howto' && s !== 'intro');
+  ui.hud.classList.toggle('show', s === 'playing' || s === 'paused' || s === 'caught' || s === 'over');
   ui.jump.classList.toggle('show', playing);
   ui.pause.classList.toggle('show', playing);
 }
 function updateHUD(bump) {
-  $('cashText').textContent = `CASH: ${fmt(Math.min(cash, 99999))} / ৳1,000`;
-  $('cashBar').style.width = clamp(cash / TARGET * 100, 0, 100) + '%';
+  $('cashText').textContent = `CASH: ${fmt(cash)}`;
+  $('hudBest').textContent = (cash > best && best > 0 ? '⭐ New best! ' : 'Best ') + fmt(Math.max(best, cash));
   if (bump) { const b = $('cashBox'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
 }
 function refreshSoundLabels() { const t = Snd.muted ? '🔇 Sound: off' : '🔊 Sound: on'; $('soundBtn').textContent = t; $('soundBtn2').textContent = t; }
-function refreshBest() { $('bestText').textContent = 'Best: ' + fmt(best); }
+function refreshBest() {
+  best = Players.id ? LB.localBest(Players.id) : 0;
+  $('bestText').textContent = Players.name ? `${Players.name} — Best: ${fmt(best)}` : 'Best: ৳0';
+}
 function startGame() {
   Snd.init(); Snd.click(); resetGame(); state = 'playing'; showScreen(null); setUI('playing'); Snd.startMusic();
   ui.jump.focus({ preventScroll: true });
@@ -1356,14 +1473,41 @@ function startGame() {
 function toMenu() { Snd.stopMusic(); if ('speechSynthesis' in window) speechSynthesis.cancel(); resetGame(); state = 'menu'; refreshBest(); showScreen('menu'); setUI('menu'); }
 function pauseGame() { if (state !== 'playing') return; state = 'paused'; Snd.stopMusic(); Snd.suspend(); showScreen('pause'); setUI('paused'); }
 function resumeGame() { if (state !== 'paused') return; Snd.resume(); state = 'playing'; showScreen(null); setUI('playing'); Snd.startMusic(); last = performance.now(); }
-function showOver() {
-  state = 'over'; if (cash > best) { best = cash; store.set('best', best); }
-  $('overCash').textContent = fmt(cash); $('overBest').textContent = 'Best: ' + fmt(best);
+async function showOver() {
+  state = 'over';
+  const isNew = cash > best && cash > 0;
+  if (isNew) best = cash;
+  $('overCash').textContent = fmt(cash); $('overBest').textContent = `${Players.name} — Best: ${fmt(best)}`;
+  $('overNew').hidden = !isNew;
+  const ol = $('overBoard'); ol.textContent = ''; const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Loading leaderboard…'; ol.appendChild(li);
   Snd.gameOver(); showScreen('over'); setUI('over');
+  const id = Players.id;
+  await LB.submit(id, Players.name, cash);
+  const list = await LB.top(50);
+  if (state === 'over') renderBoard(ol, list, id, 5);
 }
-function showWin() {
-  $('winCash').textContent = fmt(cash); $('winTime').textContent = Math.round(gameTime) + 's';
-  showScreen('win');
+let boardReturn = 'menu';
+async function openBoard(from) {
+  boardReturn = from; Snd.init(); Snd.click(); state = 'board'; showScreen('board'); setUI('board');
+  const ol = $('boardList'); ol.textContent = ''; const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Loading…'; ol.appendChild(li);
+  $('boardSrc').textContent = '';
+  const list = await LB.top(50);
+  if (state !== 'board') return;
+  $('boardSrc').textContent = LB.sourceText();
+  renderBoard(ol, list, Players.id, 20);
+}
+function openName() {
+  Snd.init(); Snd.click(); state = 'name'; showScreen('nameScr'); setUI('name');
+  const inp = $('nameInput'); inp.value = Players.name; $('nameErr').textContent = '';
+  setTimeout(() => { try { inp.focus(); inp.select(); } catch (e) {} }, 60);
+}
+function confirmName() {
+  const v = $('nameInput').value.replace(/\s+/g, ' ').trim().slice(0, 16);
+  if (!v) { $('nameErr').textContent = 'নাম লিখতে হবে — please enter a name'; $('nameInput').focus(); return; }
+  if (v.length < 2) { $('nameErr').textContent = 'কমপক্ষে ২ অক্ষর — at least 2 letters'; return; }
+  $('nameInput').blur();
+  Players.setName(v); refreshBest(); Snd.click();
+  state = 'intro'; showScreen('intro'); setUI('intro'); $('introGoBtn').focus({ preventScroll: true });
 }
 function tapJump() {
   if (state !== 'playing') return;
@@ -1377,14 +1521,20 @@ ui.jump.addEventListener('pointerup', releaseJump); ui.jump.addEventListener('po
 ui.jump.addEventListener('click', e => e.preventDefault());
 ui.jump.addEventListener('keydown', e => { if (e.key === 'Enter') e.preventDefault(); });
 window.addEventListener('keydown', e => {
+  if (e.target && e.target.tagName === 'INPUT') { if (e.key === 'Enter' && e.target.id === 'nameInput') { e.preventDefault(); confirmName(); } return; }
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { e.preventDefault(); if (!e.repeat) tapJump(); }
   if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat) { if (state === 'playing') pauseGame(); else if (state === 'paused') resumeGame(); }
 });
 ui.pause.addEventListener('click', () => { Snd.click(); pauseGame(); });
-$('playBtn').addEventListener('click', () => { Snd.init(); Snd.click(); state = 'intro'; showScreen('intro'); setUI('intro'); $('introGoBtn').focus({ preventScroll: true }); });
+$('playBtn').addEventListener('click', openName);
+$('nameGoBtn').addEventListener('click', confirmName);
+$('nameBackBtn').addEventListener('click', () => { Snd.click(); state = 'menu'; showScreen('menu'); setUI('menu'); });
+$('boardBtn').addEventListener('click', () => openBoard('menu'));
+$('overBoardBtn').addEventListener('click', () => openBoard('over'));
+$('boardBackBtn').addEventListener('click', () => { Snd.click(); if (boardReturn === 'over') { state = 'over'; showScreen('over'); setUI('over'); } else { state = 'menu'; showScreen('menu'); setUI('menu'); } });
 $('introGoBtn').addEventListener('click', startGame);
-$('introBackBtn').addEventListener('click', () => { Snd.click(); state = 'menu'; showScreen('menu'); setUI('menu'); });
-$('howPlayBtn').addEventListener('click', startGame);
+$('introBackBtn').addEventListener('click', openName);
+$('howPlayBtn').addEventListener('click', () => { if (Players.name) startGame(); else openName(); });
 $('howBtn').addEventListener('click', () => { Snd.init(); Snd.click(); state = 'howto'; showScreen('howto'); drawPreviews(); });
 $('howBackBtn').addEventListener('click', () => { Snd.click(); state = 'menu'; showScreen('menu'); });
 const toggleSound = () => { Snd.init(); Snd.setMuted(!Snd.muted); refreshSoundLabels(); Snd.click(); };
@@ -1392,10 +1542,10 @@ $('soundBtn').addEventListener('click', toggleSound); $('soundBtn2').addEventLis
 $('resumeBtn').addEventListener('click', () => { Snd.click(); resumeGame(); });
 $('restartBtn').addEventListener('click', () => { Snd.resume(); startGame(); });
 $('menuBtn').addEventListener('click', () => { Snd.resume(); Snd.click(); toMenu(); });
-$('againBtn').addEventListener('click', startGame); $('winAgainBtn').addEventListener('click', startGame);
-$('overMenuBtn').addEventListener('click', () => { Snd.click(); toMenu(); }); $('winMenuBtn').addEventListener('click', () => { Snd.click(); toMenu(); });
+$('againBtn').addEventListener('click', startGame);
+$('overMenuBtn').addEventListener('click', () => { Snd.click(); toMenu(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { if (state === 'playing') pauseGame(); else Snd.suspend(); } else if (state !== 'paused') Snd.resume(); });
-document.addEventListener('touchmove', e => { if (!e.target.closest('.card')) e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', e => { if (!(e.target.closest && e.target.closest('.card'))) e.preventDefault(); }, { passive: false });
 document.addEventListener('gesturestart', e => e.preventDefault());
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('dblclick', e => e.preventDefault());
