@@ -125,6 +125,11 @@ body{
 .rotate{display:none;margin-top:8px;font-size:14px;color:var(--muted)}
 @media (orientation:portrait){.rotate{display:block}}
 
+.rules{list-style:none;margin:4px auto 16px;padding:0;text-align:left;max-width:480px;display:grid;gap:7px}
+.rules li{display:flex;gap:10px;align-items:center;background:var(--chip);border:3px solid var(--ink);border-radius:12px;padding:6px 12px;font-size:clamp(15px,3.4vmin,19px);font-weight:600;line-height:1.35}
+.rules li b{font-size:1.35em;flex:none}
+.rules u{text-decoration:none;font-weight:800;color:var(--pink)}
+@media (max-height:460px){.rules{gap:4px;margin-bottom:10px}.rules li{padding:3px 10px;font-size:15px}}
 h2{margin:0 0 8px;font-size:clamp(24px,5.5vmin,34px);line-height:1.1}
 h3{margin:14px 0 6px;font-size:clamp(17px,3.6vmin,21px)}
 .flow{display:flex;flex-wrap:wrap;align-items:stretch;justify-content:center;gap:6px;margin:6px 0 4px}
@@ -179,6 +184,21 @@ kbd{font:700 13px "Baloo Da 2",system-ui,sans-serif;border:2px solid var(--ink);
       </div>
       <div class="best" id="bestText">Best: ৳0</div>
       <div class="rotate">📱 Turn your phone sideways for the best view.</div>
+    </div>
+  </div>
+
+  <!-- QUICK RULES (Bangla) before starting -->
+  <div class="screen" id="intro">
+    <div class="card">
+      <h2>খেলার নিয়ম</h2>
+      <ul class="rules">
+        <li><b>🏃</b>চরিত্র নিজে নিজেই দৌড়াবে — তুমি শুধু <u>JUMP ⬆</u> বাটন চাপবে।</li>
+        <li><b>💰</b>পথচারীর মাথায় লাফিয়ে পড়লে ৳৫–২০ পাবে।</li>
+        <li><b>🚓</b>পুলিশ ছুঁয়ে গেলে বা পুলিশের উপর লাফালে খেলা শেষ!</li>
+        <li><b>🚧</b>ম্যানহোল, ইট বা ময়লায় হোঁচট খেলে ৳১০ কাটা যাবে।</li>
+        <li><b>🏆</b>৳১,০০০ জমাতে পারলেই জয়!</li>
+      </ul>
+      <div class="btns"><button class="btn go" id="introGoBtn">▶ শুরু করো</button><button class="btn" id="introBackBtn">পেছনে</button></div>
     </div>
   </div>
 
@@ -1045,7 +1065,7 @@ function update(dt) {
   time += dt;
   if (state === 'paused') return;
   if (state === 'playing') { gameTime += dt; rf = 1; }
-  else if (state === 'menu' || state === 'howto') rf = 1;
+  else if (state === 'menu' || state === 'howto' || state === 'intro') rf = 1;
   else if (state === 'caught' || state === 'over') rf = 0;
   else if (state === 'won') rf = Math.max(0, rf - dt * 1.4);
   dist += RUN * rf * dt;
@@ -1314,11 +1334,11 @@ function drawPoles(offB) {
 }
 
 /* ================= UI ================= */
-const ui = { hud: $('hud'), jump: $('jumpBtn'), pause: $('pauseBtn'), screens: ['menu', 'howto', 'pause', 'over', 'win'].map($) };
+const ui = { hud: $('hud'), jump: $('jumpBtn'), pause: $('pauseBtn'), screens: ['menu', 'intro', 'howto', 'pause', 'over', 'win'].map($) };
 function showScreen(id) { ui.screens.forEach(s => s.classList.toggle('show', s.id === id)); }
 function setUI(s) {
   const playing = s === 'playing';
-  ui.hud.classList.toggle('show', s !== 'menu' && s !== 'howto');
+  ui.hud.classList.toggle('show', s !== 'menu' && s !== 'howto' && s !== 'intro');
   ui.jump.classList.toggle('show', playing);
   ui.pause.classList.toggle('show', playing);
 }
@@ -1361,7 +1381,9 @@ window.addEventListener('keydown', e => {
   if ((e.code === 'Escape' || e.code === 'KeyP') && !e.repeat) { if (state === 'playing') pauseGame(); else if (state === 'paused') resumeGame(); }
 });
 ui.pause.addEventListener('click', () => { Snd.click(); pauseGame(); });
-$('playBtn').addEventListener('click', startGame);
+$('playBtn').addEventListener('click', () => { Snd.init(); Snd.click(); state = 'intro'; showScreen('intro'); setUI('intro'); $('introGoBtn').focus({ preventScroll: true }); });
+$('introGoBtn').addEventListener('click', startGame);
+$('introBackBtn').addEventListener('click', () => { Snd.click(); state = 'menu'; showScreen('menu'); setUI('menu'); });
 $('howPlayBtn').addEventListener('click', startGame);
 $('howBtn').addEventListener('click', () => { Snd.init(); Snd.click(); state = 'howto'; showScreen('howto'); drawPreviews(); });
 $('howBackBtn').addEventListener('click', () => { Snd.click(); state = 'menu'; showScreen('menu'); });
